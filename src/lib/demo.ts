@@ -92,10 +92,14 @@ const DEMO_SOFT: Record<
   xtwitter: (p) => ({
     body: [
       `Shipped ${p.name} (${p.daysLive}d).`,
-      `Problem: ${clip(p.problem, 90)}`,
-      `For ${clip(p.whoFor, 50)}. Wedge: ${clip(p.differentiator, 70)}.`,
-      p.storeUrl ? p.storeUrl : "Curious what you'd change in the first-week promo post.",
-    ].join(" "),
+      `Problem: ${clip(p.problem, 80)}.`,
+      `For ${clip(p.whoFor, 40)}.`,
+      `Wedge: ${clip(p.differentiator, 60)}.`,
+      `Curious what you'd cut from a first-week promo post.`,
+      p.storeUrl || "",
+    ]
+      .filter(Boolean)
+      .join(" "),
   }),
 };
 
