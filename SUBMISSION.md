@@ -7,6 +7,15 @@
 Tact
 ```
 
+### BUIDL logo
+```
+public/brand/tact-buidl-logo.png (1024 × 1024 PNG)
+```
+Direct URL after deploy:
+```
+https://tact-liard.vercel.app/brand/tact-buidl-logo.png
+```
+
 ### One-line description
 ```
 Soft community posts for a newly launched product—scored for spam posture with a deterministic risk engine, not vibes.
