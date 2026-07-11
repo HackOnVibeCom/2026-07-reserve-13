@@ -1,51 +1,52 @@
-# Prooflet live pack via Tact
+# Prooflet live pack via Tact (anti-slop prompt)
+
 Generated against https://tact-liard.vercel.app
 
 ## Product Hunt maker comment
 
-- Mode: `live` · `openai/gpt-4o-mini`
-- Spam risk: **high 52**
-- Soft risk: **low 14**
-- Soft findings: No lived problem
-
-### Soft draft
-
-**Turning Idle Time into Value for Agents**
-
-I've noticed many agents sitting idle between jobs, while operators are constantly in need of small, verified tasks. This is where Prooflet comes in. Our platform allows agent operators to turn idle time into useful micro-work, providing clear access fees and rewarding participants with USDC on the Arc Testnet. After launching 21 days ago, I’m eager to hear your thoughts. How has your experience been? Any feedback on the user interface or task settlement process would be greatly appreciated. Check us out at https://prooflet.xyz.
-
-### Spam posture (contrast)
-
-**🚀 Don't Miss Out! Get Paid for Micro-Tasks NOW! 💸**
-
-Why wait to unlock the potential of your idle time? With Prooflet, you can jump right in and start earning USDC rewards while completing micro-tasks! Our platform revolutionizes how agents and operators connect over quick tasks – it’s a MUST-TRY! Don't miss out on this opportunity; sign up today and start turning your downtime into cash! Let's make micro-work a breeze! 🔥 Check it out: https://prooflet.xyz
-
----
-
-## X / Twitter
-
-- Mode: `live` · `openai/gpt-4o-mini`
-- Spam risk: **high 52**
+- Mode: `live`
+- Spam risk: **low 10**
 - Soft risk: **low 0**
 
 ### Soft draft
 
-**Idle Agents, Missed Opportunities**
+**Why I built this**
 
-Many agents find themselves sitting idle between jobs, while operators struggle to get small tasks completed efficiently. We created Prooflet to solve this. We’d love your feedback on how we can improve this experience. Check us out: https://prooflet.xyz.
+For too long, agents have sat idle between jobs while operators struggle to find small verified tasks that need doing. I built Prooflet to change that. Our platform turns idle agent time into useful micro-work with clear access fees and USDC rewards on the Arc Testnet. In just 21 days, we’ve seen how operator-controlled settlement can streamline the process. I’d love your feedback on how we can improve this experience further. Check out our platform here: https://prooflet.xyz.
 
 ### Spam posture (contrast)
 
 **🚀 Transform Your Idle Time into Cash! 💰**
 
-Tired of wasting time between jobs? Prooflet makes it easy to earn rewards with just a few clicks! 💥 Don't miss out on our revolutionary platform! Start now and see the difference! 🌟 Sign up today!
+Don't let your agents sit around doing nothing! With Prooflet, you can turn that wasted time into cash with our amazing micro-work platform! 💥 Get started today and watch your profits soar! 💸 We offer the best access fees and USDC rewards on the Arc Testnet! Don't wait, join the revolution now! 🌟
+
+---
+
+## X / Twitter
+
+- Mode: `live`
+- Spam risk: **low 24**
+- Soft risk: **low 14**
+- Soft findings: No lived problem
+
+### Soft draft
+
+**Turning Idle Time into Value**
+
+Agents often sit idle while operators need small tasks done. Prooflet connects them with clear access fees and USDC rewards on Arc Testnet. We're live for 21 days and would love your feedback on how we can improve the experience. https://prooflet.xyz
+
+### Spam posture (contrast)
+
+**🚀 Transform Your Idle Time NOW! 💰**
+
+Don't let agents waste time! Join Prooflet for instant micro-work opportunities! Get USDC rewards and settle tasks effortlessly. Hurry, the future of work is here! Sign up and start earning today! 🌟
 
 ---
 
 ## r/SideProject
 
-- Mode: `live` · `openai/gpt-4o-mini`
-- Spam risk: **medium 38**
+- Mode: `live`
+- Spam risk: **high 52**
 - Soft risk: **low 14**
 - Soft findings: No lived problem
 
@@ -53,13 +54,13 @@ Tired of wasting time between jobs? Prooflet makes it easy to earn rewards with 
 
 **I built Prooflet after struggling with idle agent time - feedback welcome**
 
-As a builder, I've often seen agents sitting idle between jobs while operators are in need of quick tasks. It’s frustrating to know that there’s a disconnect where small, verified tasks remain unfulfilled because funding and settlement can be messy. With Prooflet, I aimed to bridge that gap by turning idle time into useful micro-work. We’ve integrated a clear access fee structure and USDC rewards on the Arc Testnet, allowing operators to manage settlements directly. This has made it easier for both agents and operators to engage in micro-work without the usual complications. I would love to hear your thoughts on the platform. What features do you think would help improve this experience? You can check it out here: https://prooflet.xyz.
+For 21 days, I've been working on Prooflet. I noticed agents often sit idle between jobs, while operators need small, verified tasks done. It’s tough to fund and settle micro-work cleanly. So, I created Prooflet to turn that idle time into useful micro-work. We use Circle Gateway for a clear x402 access fee and offer USDC rewards on the Arc Testnet. Operators can control the settlement, making it straightforward. One lesson I learned is the importance of transparency in the fee structure. I'd love your feedback on the platform and any thoughts on improving the user experience. You can check it out here: https://prooflet.xyz.
 
 ### Spam posture (contrast)
 
-**🚀 Just launched Prooflet! Turn idle time into cash NOW! 💰💥**
+**🚀 Transform your idle time into cash! 💰 Join Prooflet now and earn USDC rewards! 🌟**
 
-Hey everyone! I'm super excited to announce that we just launched Prooflet! If you’ve ever been frustrated by agents sitting around doing nothing, then this is your solution! 💪💸 With our platform, you can turn that idle time into cash instantly. Plus, we offer USDC rewards on the Arc Testnet, making it super easy for operators to settle tasks without the hassle. Why wait? Check it out and start earning today! Don't miss out on this amazing opportunity! 🔥🔥🔥
+Are you tired of wasting time between jobs? With Prooflet, you can turn that idle time into cash! Our platform offers amazing USDC rewards and a super easy way to get paid for small tasks. Don't miss out on this incredible opportunity! Sign up today and start earning instantly! 💸💸💸
 
 ---
 
