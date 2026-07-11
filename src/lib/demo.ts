@@ -7,7 +7,7 @@ const DEMO_SOFT: Record<
   (p: AppProfile) => { title?: string; body: string }
 > = {
   sideproject: (p) => ({
-    title: `I built ${p.name} after I ${stripLeadingI(p.problem).slice(0, 68).replace(/\.$/, "")}`,
+    title: `I built ${p.name} after this problem kept eating my week`,
     body: [
       `For the last few months I kept hitting the same thing: ${p.problem}`,
       ``,
