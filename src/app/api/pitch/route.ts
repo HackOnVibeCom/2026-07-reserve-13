@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCommunity, COMMUNITIES } from "@/lib/communities";
 import { buildDemoPitch } from "@/lib/demo";
+import { clientKeyFromRequest, rateLimit } from "@/lib/rate-limit";
 import { scoreDraft, spamTemplate } from "@/lib/risk";
 import type {
   AppProfile,
@@ -61,16 +62,33 @@ export async function POST(req: Request) {
     return NextResponse.json(demo);
   }
 
+  // Best-effort live-model throttle (per IP, in-memory, resets on cold start).
+  const rl = rateLimit({
+    key: `live:${clientKeyFromRequest(req)}`,
+    limit: 20,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        error: `Live draft limit reached. Try demo drafts, or wait ~${rl.retryAfterSec}s.`,
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rl.retryAfterSec) },
+      },
+    );
+  }
+
   try {
     const live = await generateLive(profile, body.communityId);
     return NextResponse.json(live);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "LLM failed";
+  } catch {
     const demo = buildDemoPitch(profile, body.communityId);
     return NextResponse.json({
       ...demo,
       tips: [
-        `Live model unavailable (${message}). Showing structured demo drafts so the flow still works.`,
+        "Live model unavailable. Showing structured demo drafts so the flow still works.",
         ...demo.tips,
       ],
     } satisfies PitchResult);

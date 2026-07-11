@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { COMMUNITY_LIST } from "@/lib/communities";
 import { SAMPLE_PROFILE } from "@/lib/demo";
 import {
@@ -36,19 +36,17 @@ export function PitchDesk() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PitchResult | null>(null);
   const [copied, setCopied] = useState<"soft" | "md" | null>(null);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-
-  useEffect(() => {
-    setHistory(loadHistory());
-  }, []);
+  const [copyError, setCopyError] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>(() => loadHistory());
+  const [restoredOnly, setRestoredOnly] = useState(false);
 
   const ready = useMemo(() => {
-    return (
+    return Boolean(
       profile.name.trim() &&
-      profile.oneLiner.trim() &&
-      profile.problem.trim() &&
-      profile.whoFor.trim() &&
-      profile.differentiator.trim()
+        profile.oneLiner.trim() &&
+        profile.problem.trim() &&
+        profile.whoFor.trim() &&
+        profile.differentiator.trim(),
     );
   }, [profile]);
 
@@ -59,6 +57,7 @@ export function PitchDesk() {
   async function generate(forceDemo = false) {
     setLoading(true);
     setError(null);
+    setRestoredOnly(false);
     try {
       const res = await fetch("/api/pitch", {
         method: "POST",
@@ -84,39 +83,52 @@ export function PitchDesk() {
     }
   }
 
+  async function copyText(kind: "soft" | "md", text: string) {
+    setCopyError(null);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(kind);
+      setTimeout(() => setCopied(null), 1600);
+    } catch {
+      setCopyError("Clipboard blocked. Select the draft and copy manually.");
+    }
+  }
+
   async function copySoft() {
     if (!result) return;
     const text = [result.softDraft.title, result.softDraft.body]
       .filter(Boolean)
       .join("\n\n");
-    await navigator.clipboard.writeText(text);
-    setCopied("soft");
-    setTimeout(() => setCopied(null), 1600);
+    await copyText("soft", text);
   }
 
   async function copyMarkdown() {
     if (!result) return;
-    await navigator.clipboard.writeText(formatSoftMarkdown(result));
-    setCopied("md");
-    setTimeout(() => setCopied(null), 1600);
+    await copyText("md", formatSoftMarkdown(result));
   }
 
   function restoreHistory(item: HistoryItem) {
+    setProfile({
+      ...item.profile,
+      storeUrl: item.profile.storeUrl || "",
+    });
+    setCommunityId(item.communityId);
+    setRestoredOnly(true);
     setResult({
       communityId: item.communityId,
       spamDraft: {
-        title: "Saved entry (soft draft only)",
-        body: "Open a fresh draft to regenerate the spam contrast.",
+        title: "Not stored in history",
+        body: "History keeps the soft draft. Hit Regenerate for a full spam contrast.",
       },
       softDraft: {
         title: item.softTitle,
         body: item.softBody,
       },
       spamRisk: {
-        level: "high",
-        score: 80,
+        level: "medium",
+        score: 0,
         findings: [],
-        summary: "Not rescored. Generate again for a full contrast.",
+        summary: "Spam contrast not stored. Regenerate for a full pair.",
       },
       softRisk: {
         level: item.softRiskLevel,
@@ -127,7 +139,6 @@ export function PitchDesk() {
       tips: ["History is stored only in this browser."],
       mode: item.mode,
     });
-    setCommunityId(item.communityId);
   }
 
   return (
@@ -237,8 +248,11 @@ export function PitchDesk() {
             </Field>
           </div>
 
-          <Field label="Community">
-            <div className="grid gap-2">
+          <div className="space-y-1.5">
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-[var(--mute)]">
+              Community
+            </span>
+            <div className="grid gap-2" role="radiogroup" aria-label="Community">
               {COMMUNITY_LIST.map((c) => (
                 <label
                   key={c.id}
@@ -266,7 +280,7 @@ export function PitchDesk() {
                 </label>
               ))}
             </div>
-          </Field>
+          </div>
 
           <div className="flex flex-wrap gap-3 pt-1">
             <button
@@ -373,6 +387,7 @@ export function PitchDesk() {
               <div className="text-xs uppercase tracking-[0.14em] text-[var(--mute)]">
                 Mode · {result.mode}
                 {result.model ? ` · ${result.model}` : ""}
+                {restoredOnly ? " · restored" : ""}
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -391,14 +406,21 @@ export function PitchDesk() {
                 </button>
               </div>
             </div>
+            {copyError && (
+              <p className="text-sm text-[var(--bad)]" role="alert">
+                {copyError}
+              </p>
+            )}
 
             <div className="grid gap-4 xl:grid-cols-2">
-              <DraftCard
-                kind="spam"
-                title={result.spamDraft.title}
-                body={result.spamDraft.body}
-                risk={result.spamRisk}
-              />
+              {!restoredOnly && (
+                <DraftCard
+                  kind="spam"
+                  title={result.spamDraft.title}
+                  body={result.spamDraft.body}
+                  risk={result.spamRisk}
+                />
+              )}
               <DraftCard
                 kind="soft"
                 title={result.softDraft.title}

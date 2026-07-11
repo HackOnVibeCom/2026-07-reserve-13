@@ -1,6 +1,6 @@
-import type { CommunityId, PitchResult, AppProfile } from "./types";
+import type { AppProfile, CommunityId, PitchResult } from "./types";
 
-const KEY = "tact-history-v1";
+const KEY = "tact-history-v2";
 const MAX = 8;
 
 export type HistoryItem = {
@@ -8,6 +8,7 @@ export type HistoryItem = {
   savedAt: string;
   communityId: CommunityId;
   appName: string;
+  profile: AppProfile;
   softTitle?: string;
   softBody: string;
   softRiskLevel: PitchResult["softRisk"]["level"];
@@ -21,7 +22,16 @@ export function loadHistory(): HistoryItem[] {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as HistoryItem[];
-    return Array.isArray(parsed) ? parsed.slice(0, MAX) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (h) =>
+          h &&
+          typeof h.appName === "string" &&
+          h.profile &&
+          typeof h.softBody === "string",
+      )
+      .slice(0, MAX);
   } catch {
     return [];
   }
@@ -36,6 +46,16 @@ export function pushHistory(
     savedAt: new Date().toISOString(),
     communityId: result.communityId,
     appName: profile.name,
+    profile: {
+      name: profile.name,
+      oneLiner: profile.oneLiner,
+      problem: profile.problem,
+      whoFor: profile.whoFor,
+      platform: profile.platform,
+      daysLive: profile.daysLive,
+      differentiator: profile.differentiator,
+      storeUrl: profile.storeUrl || "",
+    },
     softTitle: result.softDraft.title,
     softBody: result.softDraft.body,
     softRiskLevel: result.softRisk.level,
@@ -57,6 +77,7 @@ export function pushHistory(
 export function clearHistory(): void {
   try {
     window.localStorage.removeItem(KEY);
+    window.localStorage.removeItem("tact-history-v1");
   } catch {
     // ignore
   }

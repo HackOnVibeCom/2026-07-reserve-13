@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
 } from "react";
 
 export type ThemePreference = "light" | "dark" | "system";
@@ -23,49 +24,62 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-function resolvePreference(pref: ThemePreference): ResolvedTheme {
-  if (pref === "light" || pref === "dark") return pref;
+function readStored(): ThemePreference {
+  if (typeof window === "undefined") return "system";
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw === "light" || raw === "dark" || raw === "system") return raw;
+  } catch {
+    // ignore
+  }
+  return "system";
+}
+
+function applyDom(theme: ResolvedTheme) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.toggle("dark", theme === "dark");
+}
+
+function subscribeSystem(cb: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+
+function getSystemSnapshot(): ResolvedTheme {
   if (typeof window === "undefined") return "light";
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
 }
 
-function readStored(): ThemePreference {
-  if (typeof window === "undefined") return "system";
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (raw === "light" || raw === "dark" || raw === "system") return raw;
-  return "system";
+function getServerSnapshot(): ResolvedTheme {
+  return "light";
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [preference, setPreferenceState] = useState<ThemePreference>("system");
-  const [resolved, setResolved] = useState<ResolvedTheme>("light");
-  const [ready, setReady] = useState(false);
+  const [preference, setPreferenceState] = useState<ThemePreference>(() =>
+    readStored(),
+  );
+  const systemTheme = useSyncExternalStore(
+    subscribeSystem,
+    getSystemSnapshot,
+    getServerSnapshot,
+  );
+
+  const resolved: ResolvedTheme =
+    preference === "system" ? systemTheme : preference;
 
   useEffect(() => {
-    const pref = readStored();
-    setPreferenceState(pref);
-    setResolved(resolvePreference(pref));
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
-    const next = resolvePreference(preference);
-    setResolved(next);
-    document.documentElement.dataset.theme = next;
-    document.documentElement.classList.toggle("dark", next === "dark");
-    window.localStorage.setItem(STORAGE_KEY, preference);
-  }, [preference, ready]);
-
-  useEffect(() => {
-    if (preference !== "system") return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => setResolved(resolvePreference("system"));
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [preference]);
+    applyDom(resolved);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, preference);
+    } catch {
+      // ignore
+    }
+  }, [preference, resolved]);
 
   const setPreference = useCallback((value: ThemePreference) => {
     setPreferenceState(value);

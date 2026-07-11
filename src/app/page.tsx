@@ -157,8 +157,8 @@ export default function Home() {
                   free channels convert only if the post doesn’t read like an ad
                 </li>
                 <li>
-                  <span className="font-medium text-[var(--ink)]">Offer:</span> 3
-                  free drafts · Pro $9/mo unlimited + more rooms
+                  <span className="font-medium text-[var(--ink)]">Offer idea:</span>{" "}
+                  free demo drafts · Pro $9/mo for live rooms + history sync
                 </li>
                 <li>
                   <span className="font-medium text-[var(--ink)]">First users:</span>{" "}
