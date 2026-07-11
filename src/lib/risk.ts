@@ -41,10 +41,11 @@ export function scoreDraft(
     });
   }
 
+  const firstChunk = firstLine.slice(0, 96);
   if (
-    STORE_PUSH.test(firstLine) ||
-    /https?:\/\//i.test(firstLine) ||
-    /\bdownload now\b/i.test(firstLine)
+    STORE_PUSH.test(firstChunk) ||
+    /https?:\/\//i.test(firstChunk) ||
+    /\bdownload now\b/i.test(firstChunk)
   ) {
     score += 24;
     findings.push({
