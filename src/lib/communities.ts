@@ -12,7 +12,7 @@ export const COMMUNITIES: Record<CommunityId, Community> = {
       "One soft ask at most; link only after context",
       "No ALL-CAPS launch hype or emoji walls",
     ],
-    titleHint: "I built X after struggling with Y — feedback welcome",
+    titleHint: "I built X after struggling with Y - feedback welcome",
     maxWords: 220,
   },
   iosprogramming: {
@@ -26,7 +26,7 @@ export const COMMUNITIES: Record<CommunityId, Community> = {
       "Avoid pure growth / ASO flex posts",
       "Store link only after substance",
     ],
-    titleHint: "Shipped my first iOS app — curious how you handle X",
+    titleHint: "Shipped my first iOS app - curious how you handle X",
     maxWords: 200,
   },
   indiehackers: {
@@ -54,7 +54,7 @@ export const COMMUNITIES: Record<CommunityId, Community> = {
       "Invite critique on a concrete choice",
       "Link after the technical meat",
     ],
-    titleHint: "Launched on Play — tradeoffs I made on X",
+    titleHint: "Launched on Play - tradeoffs I made on X",
     maxWords: 200,
   },
 };

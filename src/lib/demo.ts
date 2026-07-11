@@ -11,14 +11,14 @@ const DEMO_SOFT: Record<
     body: [
       `For the last few months I kept hitting the same thing: ${p.problem}`,
       ``,
-      `So I shipped ${p.name} — ${p.oneLiner}`,
+      `So I shipped ${p.name} - ${p.oneLiner}`,
       ``,
       `Who it's for: ${p.whoFor}.`,
       `What I think is different: ${p.differentiator}.`,
       ``,
       `It went live about ${p.daysLive} day${p.daysLive === 1 ? "" : "s"} ago on ${platformLabel(p.platform)}.`,
       ``,
-      `I'm not trying to spam the sub — honestly looking for blunt feedback:`,
+      `I'm not trying to spam the sub - honestly looking for blunt feedback:`,
       `1) Does the problem sound real to you?`,
       `2) What would make a first-week post like this useful vs annoying?`,
       ``,
@@ -28,7 +28,7 @@ const DEMO_SOFT: Record<
     ].join("\n"),
   }),
   iosprogramming: (p) => ({
-    title: `Shipped ${p.name} on iOS — how do you handle first-week community posts?`,
+    title: `Shipped ${p.name} on iOS - how do you handle first-week community posts?`,
     body: [
       `Just put ${p.name} live (${p.daysLive}d). ${p.oneLiner}`,
       ``,
@@ -53,21 +53,21 @@ const DEMO_SOFT: Record<
       `Audience: ${p.whoFor}`,
       `Wedge: ${p.differentiator}`,
       ``,
-      `Distribution experiment this week: write community posts that read like a founder note, not an ad — and measure replies, not vanity views.`,
+      `Distribution experiment this week: write community posts that read like a founder note, not an ad - and measure replies, not vanity views.`,
       ``,
       `What I'd love feedback on: which channels actually work for a brand-new mobile app when you have $0 UA budget?`,
       p.storeUrl ? `\nLink: ${p.storeUrl}` : "",
     ].join("\n"),
   }),
   androiddev: (p) => ({
-    title: `Launched ${p.name} on Play — tradeoffs + anti-spam promo question`,
+    title: `Launched ${p.name} on Play - tradeoffs + anti-spam promo question`,
     body: [
       `${p.name} has been on Play for ~${p.daysLive} day${p.daysLive === 1 ? "" : "s"}. ${p.oneLiner}`,
       ``,
       `Motivation: ${p.problem}`,
       `For: ${p.whoFor}. Bet: ${p.differentiator}.`,
       ``,
-      `Not a growth-hack post — curious how other Android indies announce a launch without getting roasted. Do you lead with architecture choices, Play Console lessons, or user problem?`,
+      `Not a growth-hack post - curious how other Android indies announce a launch without getting roasted. Do you lead with architecture choices, Play Console lessons, or user problem?`,
       ``,
       p.storeUrl
         ? `Play link if anyone wants to look: ${p.storeUrl}`
@@ -90,7 +90,7 @@ function stripLeadingI(text: string): string {
 export const SAMPLE_PROFILE: AppProfile = {
   name: "Focusrail",
   oneLiner:
-    "A focus timer that blocks the distracting apps you actually open between client calls — not a generic pomodoro skin.",
+    "A focus timer that blocks the distracting apps you actually open between client calls - not a generic pomodoro skin.",
   problem:
     "every freelancing afternoon I told myself “one more scroll” between Zoom calls and lost 40 minutes",
   whoFor: "solo freelancers and consultants who work from their phone calendar",
@@ -116,7 +116,7 @@ export function buildDemoPitch(
     softRisk: scoreDraft(soft.title, soft.body, community),
     tips: [
       `Match ${community.name}: ${community.rules[0]}`,
-      "Put one lived detail only you would know — generic AI polish gets ignored.",
+      "Put one lived detail only you would know - generic AI polish gets ignored.",
       "One link max, after the ask.",
       "Reply to every comment in the first hour; that is part of the pitch.",
     ],

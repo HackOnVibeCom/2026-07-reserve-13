@@ -1,17 +1,17 @@
-# DoraHacks / HackOnVibe submission pack — Tact
+# DoraHacks / HackOnVibe submission pack - Tact
 
 ## Project name
 **Tact**
 
 ## One-liner
-Community posts for a newly launched mobile app that read like a founder note — not an ad — with deterministic spam-risk scoring.
+Community posts for a newly launched mobile app that read like a founder note - not an ad - with deterministic spam-risk scoring.
 
 ## Theme fit
 HackOnVibe July 2026 theme: **effective promotion of a newly launched mobile app**.  
-Tact targets the free-channel moment (Reddit, Indie Hackers) in days 0–14 after go-live, where spam posture kills distribution.
+Tact targets the free-channel moment (Reddit, Indie Hackers) in days 0-14 after go-live, where spam posture kills distribution.
 
 ## Track
-**Business Success** (primary) — clear buyer, $9/mo pricing path, dogfood GTM.  
+**Business Success** (primary) - clear buyer, $9/mo pricing path, dogfood GTM.  
 World Impact optional secondary narrative: healthier public forums / less spam.
 
 ## Target users
@@ -29,7 +29,7 @@ Solo indie iOS/Android builders who just shipped and need one good community pos
 - Live demo: https://tact-liard.vercel.app
 - Desk: https://tact-liard.vercel.app/app
 - GitHub: https://github.com/ShalyX/tact
-- Demo video: *(unlisted YouTube, ≤3 min — use docs/demo-script.md)*
+- Demo video: *(unlisted YouTube, ≤3 min - use docs/demo-script.md)*
 
 ## How to run
 ```bash

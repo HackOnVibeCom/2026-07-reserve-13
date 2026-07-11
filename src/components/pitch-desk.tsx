@@ -1,8 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { COMMUNITY_LIST } from "@/lib/communities";
 import { SAMPLE_PROFILE } from "@/lib/demo";
+import {
+  clearHistory,
+  formatSoftMarkdown,
+  loadHistory,
+  pushHistory,
+  type HistoryItem,
+} from "@/lib/history";
 import type {
   AppProfile,
   CommunityId,
@@ -28,7 +35,12 @@ export function PitchDesk() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PitchResult | null>(null);
-  const [copied, setCopied] = useState<"soft" | "spam" | null>(null);
+  const [copied, setCopied] = useState<"soft" | "md" | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
 
   const ready = useMemo(() => {
     return (
@@ -62,7 +74,9 @@ export function PitchDesk() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Request failed");
-      setResult(data as PitchResult);
+      const pitch = data as PitchResult;
+      setResult(pitch);
+      setHistory(pushHistory(profile, pitch));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed");
     } finally {
@@ -78,6 +92,42 @@ export function PitchDesk() {
     await navigator.clipboard.writeText(text);
     setCopied("soft");
     setTimeout(() => setCopied(null), 1600);
+  }
+
+  async function copyMarkdown() {
+    if (!result) return;
+    await navigator.clipboard.writeText(formatSoftMarkdown(result));
+    setCopied("md");
+    setTimeout(() => setCopied(null), 1600);
+  }
+
+  function restoreHistory(item: HistoryItem) {
+    setResult({
+      communityId: item.communityId,
+      spamDraft: {
+        title: "Saved entry (soft draft only)",
+        body: "Open a fresh draft to regenerate the spam contrast.",
+      },
+      softDraft: {
+        title: item.softTitle,
+        body: item.softBody,
+      },
+      spamRisk: {
+        level: "high",
+        score: 80,
+        findings: [],
+        summary: "Not rescored. Generate again for a full contrast.",
+      },
+      softRisk: {
+        level: item.softRiskLevel,
+        score: item.softRiskScore,
+        findings: [],
+        summary: "Restored from local history on this device.",
+      },
+      tips: ["History is stored only in this browser."],
+      mode: item.mode,
+    });
+    setCommunityId(item.communityId);
   }
 
   return (
@@ -235,6 +285,16 @@ export function PitchDesk() {
             >
               Demo drafts only
             </button>
+            {result && (
+              <button
+                type="button"
+                disabled={!ready || loading}
+                onClick={() => generate(false)}
+                className="rounded-full border border-[var(--line-strong)] px-4 py-2.5 text-sm text-[var(--mute)] transition hover:text-[var(--ink)] disabled:opacity-40"
+              >
+                Regenerate
+              </button>
+            )}
           </div>
           {error && (
             <p className="text-sm text-[var(--bad)]" role="alert">
@@ -242,6 +302,49 @@ export function PitchDesk() {
             </p>
           )}
         </div>
+
+        {history.length > 0 && (
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--paper-2)] p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-sm font-medium text-[var(--ink)]">
+                Recent on this device
+              </h2>
+              <button
+                type="button"
+                onClick={() => {
+                  clearHistory();
+                  setHistory([]);
+                }}
+                className="text-xs text-[var(--mute)] transition hover:text-[var(--ink)]"
+              >
+                Clear
+              </button>
+            </div>
+            <ul className="mt-3 space-y-2">
+              {history.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => restoreHistory(item)}
+                    className="w-full rounded-xl border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-left transition hover:border-[var(--line-strong)]"
+                  >
+                    <div className="flex items-center justify-between gap-2 text-sm">
+                      <span className="font-medium text-[var(--ink)]">
+                        {item.appName}
+                      </span>
+                      <span className="text-xs uppercase tracking-wide text-[var(--mute)]">
+                        {item.softRiskLevel} · {item.softRiskScore}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 truncate text-xs text-[var(--mute)]">
+                      {item.softTitle || item.softBody.slice(0, 80)}
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       <section className="space-y-5">
@@ -253,7 +356,7 @@ export function PitchDesk() {
               </p>
               <p className="mt-2 max-w-sm text-sm text-[var(--mute)]">
                 Spam posture on the left. Soft post on the right. Risk score
-                from rules — not vibes.
+                from rules, not vibes.
               </p>
             </div>
             <ol className="space-y-3 text-sm text-[var(--mute)]">
@@ -271,13 +374,22 @@ export function PitchDesk() {
                 Mode · {result.mode}
                 {result.model ? ` · ${result.model}` : ""}
               </div>
-              <button
-                type="button"
-                onClick={copySoft}
-                className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                {copied === "soft" ? "Copied soft draft" : "Copy soft draft"}
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={copySoft}
+                  className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                >
+                  {copied === "soft" ? "Copied soft draft" : "Copy soft draft"}
+                </button>
+                <button
+                  type="button"
+                  onClick={copyMarkdown}
+                  className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--mute)] transition hover:text-[var(--ink)]"
+                >
+                  {copied === "md" ? "Copied markdown" : "Copy markdown"}
+                </button>
+              </div>
             </div>
 
             <div className="grid gap-4 xl:grid-cols-2">

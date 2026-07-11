@@ -15,7 +15,7 @@ const ASK_HINT =
   /\b(feedback|curious|how (do|would|are) you|what do you|roast|thoughts|anyone else|looking for)\b/i;
 
 function levelFromScore(score: number): RiskLevel {
-  if (score >= 55) return "high";
+  if (score >= 50) return "high";
   if (score >= 28) return "medium";
   return "low";
 }
@@ -41,7 +41,11 @@ export function scoreDraft(
     });
   }
 
-  if (STORE_PUSH.test(firstLine) || /https?:\/\//i.test(firstLine)) {
+  if (
+    STORE_PUSH.test(firstLine) ||
+    /https?:\/\//i.test(firstLine) ||
+    /\bdownload now\b/i.test(firstLine)
+  ) {
     score += 24;
     findings.push({
       id: "cta-first",
@@ -156,7 +160,7 @@ export function scoreDraft(
 
   const summary =
     level === "low"
-      ? "Reads like a founder sharing work — low spam posture."
+      ? "Reads like a founder sharing work - low spam posture."
       : level === "medium"
         ? "Usable, but a few patterns still lean promotional."
         : "High chance of ignores, downvotes, or mod removal.";
@@ -171,16 +175,16 @@ export function spamTemplate(profile: {
 }): { title: string; body: string } {
   const link = profile.storeUrl?.trim() || "https://apps.example.com/you";
   return {
-    title: `🚀🚀 JUST LAUNCHED ${profile.name.toUpperCase()} — DOWNLOAD NOW!!!`,
+    title: `DOWNLOAD NOW: ${profile.name.toUpperCase()} IS LIVE!!!`,
     body: [
-      `Hey guys!!! I just launched ${profile.name} 🔥🔥🔥`,
+      `Download now: ${link}`,
+      ``,
+      `Hey guys!!! I just launched ${profile.name} 🔥🔥🔥🔥`,
       ``,
       `${profile.oneLiner}`,
       ``,
-      `It is a GAME CHANGER. Don't miss out — limited time!`,
-      ``,
-      `Download now: ${link}`,
-      `Also follow me for more 💯`,
+      `It is a GAME CHANGER. Don't miss out - limited time!`,
+      `Also: ${link}`,
       ``,
       `Please download and leave a 5-star review 🙏🙏🙏`,
     ].join("\n"),

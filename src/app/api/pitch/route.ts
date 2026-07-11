@@ -99,7 +99,7 @@ Return ONLY valid JSON with this shape:
 Rules for softTitle/softBody:
 - Match the venue norms exactly.
 - Lead with a lived problem, not a download CTA.
-- Sound human, specific, slightly imperfect — not marketing.
+- Sound human, specific, slightly imperfect - not marketing.
 - One optional link only if provided, placed late.
 - Include one concrete ask for feedback.
 - Stay under ${community.maxWords} words for the body.

@@ -1,6 +1,6 @@
 # Tact
 
-**Community posts for a newly launched mobile app — without the hard sell.**
+**Community posts for a newly launched mobile app - without the hard sell.**
 
 Tact is a micro-product for solo indies in the first two weeks after ship. You enter app facts, pick a community room, and get:
 
@@ -9,13 +9,13 @@ Tact is a micro-product for solo indies in the first two weeks after ship. You e
 3. A **deterministic spam-risk score** (rules engine, not vibes)
 4. Concrete findings + tips
 
-Built for [HackOnVibe — July 2026](https://dorahacks.io/hackathon/hack-on-vibe-2026-07/detail) theme: *effective promotion of a newly launched mobile app*.
+Built for [HackOnVibe - July 2026](https://dorahacks.io/hackathon/hack-on-vibe-2026-07/detail) theme: *effective promotion of a newly launched mobile app*.
 
 ## Product
 
 | | |
 |--|--|
-| **User** | Solo mobile indie, days 0–14 post-launch |
+| **User** | Solo mobile indie, days 0-14 post-launch |
 | **Job** | Write one community post that won’t get ignored or removed |
 | **Rooms** | r/SideProject, r/iOSProgramming, Indie Hackers, r/androiddev |
 | **Pricing idea** | Free: 3 drafts · Pro $9/mo |
@@ -49,7 +49,7 @@ Open [http://localhost:3000](http://localhost:3000) → **Open desk**.
 | `OPENROUTER_API_KEY` | No | Live model drafts |
 | `OPENROUTER_MODEL` | No | Default `openai/gpt-4o-mini` |
 
-Without a key, use **Demo drafts only** — fully works for judges.
+Without a key, use **Demo drafts only** - fully works for judges.
 
 ## Demo path (~90s)
 

@@ -19,7 +19,7 @@ export default function Home() {
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-[var(--mute)]">
               Tact turns your app facts into community-native posts for Reddit
-              and Indie Hackers — then scores spam posture with a real rules
+              and Indie Hackers, then scores spam posture with a real rules
               engine. Built for the first two weeks after ship.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -43,7 +43,7 @@ export default function Home() {
               </div>
               <div>
                 <dt className="text-[var(--mute)]">Moment</dt>
-                <dd className="mt-1 font-medium">Days 0–14</dd>
+                <dd className="mt-1 font-medium">Days 0-14</dd>
               </div>
               <div>
                 <dt className="text-[var(--mute)]">Price idea</dt>
@@ -64,7 +64,7 @@ export default function Home() {
                     Spam posture · 86
                   </p>
                   <p className="mt-3 font-[family-name:var(--font-display)] text-lg leading-snug">
-                    JUST LAUNCHED FOCUSRAIL — DOWNLOAD NOW!!!
+                    DOWNLOAD NOW: FOCUSRAIL IS LIVE!!!
                   </p>
                   <p className="mt-3 text-sm leading-relaxed text-[var(--mute)]">
                     Game changer 🔥🔥 Download and leave 5 stars…
@@ -105,7 +105,7 @@ export default function Home() {
                 {
                   n: "02",
                   t: "Pick the room",
-                  d: "r/SideProject, r/iOSProgramming, Indie Hackers, r/androiddev — each with different norms.",
+                  d: "r/SideProject, r/iOSProgramming, Indie Hackers, r/androiddev - each with different norms.",
                 },
                 {
                   n: "03",
@@ -162,7 +162,7 @@ export default function Home() {
                 </li>
                 <li>
                   <span className="font-medium text-[var(--ink)]">First users:</span>{" "}
-                  ship Tact itself with Tact — dogfood the soft pitch
+                  ship Tact itself with Tact - dogfood the soft pitch
                 </li>
               </ul>
             </div>
