@@ -83,9 +83,6 @@ function platformLabel(p: AppProfile["platform"]): string {
   return "web / installable";
 }
 
-function stripLeadingI(text: string): string {
-  return text.trim().replace(/^i\s+/i, "");
-}
 
 export const SAMPLE_PROFILE: AppProfile = {
   name: "Focusrail",
