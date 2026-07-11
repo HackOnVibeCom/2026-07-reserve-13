@@ -104,7 +104,7 @@ async function generateLive(
     process.env.OPENROUTER_MODEL?.trim() || "openai/gpt-4o-mini";
   const apiKey = process.env.OPENROUTER_API_KEY!;
 
-  const system = `You write community posts for founders who just launched a mobile app.
+  const system = `You write community posts for founders who just shipped a product (mobile or web).
 Return ONLY valid JSON with this shape:
 {
   "softTitle": string,
@@ -114,18 +114,29 @@ Return ONLY valid JSON with this shape:
   "tips": string[3]
 }
 
-Rules for softTitle/softBody:
+Rules for softTitle/softBody (the good draft):
 - Match the venue norms exactly.
-- Lead with a lived problem, not a download CTA.
-- Sound human, specific, slightly imperfect - not marketing.
-- One optional link only if provided, placed late.
+- Lead with a lived problem or concrete friction, not a download CTA.
+- Sound like a real founder: short sentences, specific details from the profile, slightly imperfect.
+- Use the product's actual differentiator and problem wording; do not invent fake metrics, users, partners, or awards.
+- One optional link only if provided, placed late (end of post).
 - Include one concrete ask for feedback.
 - Stay under ${community.maxWords} words for the body.
-- No emoji walls, no ALL CAPS hype, no “game changer”.
+- For X/Twitter: no separate title needed (softTitle can be empty string); keep body tight.
+- For Product Hunt: first-person maker note, not a second landing page.
+
+Hard ban list for soft drafts (never use these):
+- "I've noticed", "In today's world", "revolutionize/revolutionary", "game changer", "unlock the potential"
+- "seamless", "cutting-edge", "excited to announce", "super excited", "don't miss out"
+- "Check us out", "Check it out", "sign up today", "jump right in"
+- "This is where X comes in", "We created X to solve this" as the whole thesis with no specifics
+- Emoji walls, ALL CAPS hype, fake social proof, engagement bait
+
+Prefer: plain verbs, one specific example, honest stage (days live), one clear ask.
 
 Rules for spamTitle/spamBody:
-- Intentionally bad launch spam for contrast (hype, early CTA, emoji, pressure).
-- Still about the same app.
+- Intentionally bad launch spam for contrast (hype, early CTA, emoji, pressure, empty adjectives).
+- Still about the same product.
 
 Venue: ${community.name} (${community.venue})
 Tone: ${community.tone}
@@ -153,7 +164,7 @@ Store URL: ${profile.storeUrl || "(none)"}`;
     },
     body: JSON.stringify({
       model,
-      temperature: 0.7,
+      temperature: 0.45,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: system },
