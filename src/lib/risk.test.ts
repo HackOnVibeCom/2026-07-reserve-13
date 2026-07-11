@@ -46,6 +46,14 @@ describe("demo pitch", () => {
     expect(pitch.softRisk.level).toBe("low");
     expect(pitch.softDraft.body.length).toBeGreaterThan(40);
   });
+
+  it("supports producthunt and xtwitter rooms", () => {
+    const ph = buildDemoPitch(SAMPLE_PROFILE, "producthunt");
+    const x = buildDemoPitch(SAMPLE_PROFILE, "xtwitter");
+    expect(ph.softDraft.body.toLowerCase()).toContain("maker");
+    expect(x.softDraft.body.length).toBeGreaterThan(20);
+    expect(x.softRisk.score).toBeLessThan(ph.spamRisk.score);
+  });
 });
 
 describe("formatSoftMarkdown", () => {

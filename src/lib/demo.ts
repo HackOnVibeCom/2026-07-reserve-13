@@ -55,7 +55,7 @@ const DEMO_SOFT: Record<
       ``,
       `Distribution experiment this week: write community posts that read like a founder note, not an ad - and measure replies, not vanity views.`,
       ``,
-      `What I'd love feedback on: which channels actually work for a brand-new mobile app when you have $0 UA budget?`,
+      `What I'd love feedback on: which channels actually work for a brand-new product when you have $0 UA budget?`,
       p.storeUrl ? `\nLink: ${p.storeUrl}` : "",
     ].join("\n"),
   }),
@@ -74,15 +74,43 @@ const DEMO_SOFT: Record<
         : `Can share the listing if useful.`,
     ].join("\n"),
   }),
+  producthunt: (p) => ({
+    title: `Maker note: why ${p.name} exists`,
+    body: [
+      `Hey hunters - I'm the maker.`,
+      ``,
+      `I built ${p.name} because ${p.problem}.`,
+      ``,
+      `${p.oneLiner}`,
+      ``,
+      `Built for ${p.whoFor}. The wedge I'm betting on: ${p.differentiator}.`,
+      ``,
+      `If you try it, I'd love feedback on whether the first 2 minutes make the job clear.`,
+      p.storeUrl ? `\n${p.storeUrl}` : "",
+    ].join("\n"),
+  }),
+  xtwitter: (p) => ({
+    body: [
+      `Shipped ${p.name} (${p.daysLive}d).`,
+      `Problem: ${clip(p.problem, 90)}`,
+      `For ${clip(p.whoFor, 50)}. Wedge: ${clip(p.differentiator, 70)}.`,
+      p.storeUrl ? p.storeUrl : "Curious what you'd change in the first-week promo post.",
+    ].join(" "),
+  }),
 };
+
+function clip(s: string, n: number): string {
+  const t = s.trim();
+  if (t.length <= n) return t;
+  return `${t.slice(0, n - 1).trim()}…`;
+}
 
 function platformLabel(p: AppProfile["platform"]): string {
   if (p === "ios") return "the App Store";
   if (p === "android") return "Google Play";
   if (p === "both") return "iOS + Android";
-  return "web / installable";
+  return "web";
 }
-
 
 export const SAMPLE_PROFILE: AppProfile = {
   name: "Focusrail",
@@ -96,6 +124,21 @@ export const SAMPLE_PROFILE: AppProfile = {
   differentiator:
     "blocklists are per-context (client day vs deep work) and it never guilt-trips you with streak shame",
   storeUrl: "https://apps.apple.com/app/focusrail-demo",
+};
+
+/** Grounded Prooflet profile for dogfooding (web product, not a mobile store app). */
+export const PROOFLET_PROFILE: AppProfile = {
+  name: "Prooflet",
+  oneLiner:
+    "Turns idle agent time into useful micro-work with clear access fees and USDC rewards on Arc Testnet.",
+  problem:
+    "agents sit idle between jobs while operators need small verified tasks done, but open micro-work is hard to fund and settle cleanly",
+  whoFor: "agent operators and builders who need short tasks done with explicit settlement",
+  platform: "web",
+  daysLive: 21,
+  differentiator:
+    "Circle Gateway x402 access fee plus Arc Testnet USDC rewards with operator-controlled settlement - not a vague crypto marketplace pitch",
+  storeUrl: "https://prooflet.xyz",
 };
 
 export function buildDemoPitch(
@@ -115,7 +158,9 @@ export function buildDemoPitch(
       `Match ${community.name}: ${community.rules[0]}`,
       "Put one lived detail only you would know - generic AI polish gets ignored.",
       "One link max, after the ask.",
-      "Reply to every comment in the first hour; that is part of the pitch.",
+      communityId === "xtwitter"
+        ? "On X, cut until it still makes sense without the link."
+        : "Reply to every comment in the first hour; that is part of the pitch.",
     ],
     mode: "demo",
   };

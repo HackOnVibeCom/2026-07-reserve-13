@@ -1,8 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { COMMUNITY_LIST } from "@/lib/communities";
-import { SAMPLE_PROFILE } from "@/lib/demo";
+import { COMMUNITY_LIST, getCommunity } from "@/lib/communities";
+import { PROOFLET_PROFILE, SAMPLE_PROFILE } from "@/lib/demo";
+import {
+  canUseLive,
+  consumeLive,
+  FREE_LIVE_LIMIT,
+  getLiveRemaining,
+} from "@/lib/free-tier";
 import {
   clearHistory,
   formatSoftMarkdown,
@@ -10,12 +16,15 @@ import {
   pushHistory,
   type HistoryItem,
 } from "@/lib/history";
+import { scoreDraft } from "@/lib/risk";
+import { pitchToSharePayload, shareUrl } from "@/lib/share";
 import type {
   AppProfile,
   CommunityId,
   PitchResult,
 } from "@/lib/types";
 import { RiskBadge, RiskList } from "./risk-badge";
+import { RiskCompare } from "./risk-meter";
 
 const empty: AppProfile = {
   name: "",
@@ -35,10 +44,15 @@ export function PitchDesk() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PitchResult | null>(null);
-  const [copied, setCopied] = useState<"soft" | "md" | null>(null);
+  const [copied, setCopied] = useState<"soft" | "md" | "share" | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>(() => loadHistory());
   const [restoredOnly, setRestoredOnly] = useState(false);
+  const [liveLeft, setLiveLeft] = useState(() => getLiveRemaining());
+  const [editTitle, setEditTitle] = useState("");
+  const [editBody, setEditBody] = useState("");
+  const [meterKey, setMeterKey] = useState(0);
+  const [shareLink, setShareLink] = useState<string | null>(null);
 
   const ready = useMemo(() => {
     return Boolean(
@@ -54,10 +68,29 @@ export function PitchDesk() {
     setProfile((p) => ({ ...p, [key]: value }));
   }
 
+  function applyResult(pitch: PitchResult) {
+    setResult(pitch);
+    setEditTitle(pitch.softDraft.title || "");
+    setEditBody(pitch.softDraft.body);
+    setMeterKey((k) => k + 1);
+    setShareLink(
+      shareUrl(pitchToSharePayload(profile.name, pitch, profile.oneLiner)),
+    );
+  }
+
   async function generate(forceDemo = false) {
     setLoading(true);
     setError(null);
     setRestoredOnly(false);
+
+    let useDemo = forceDemo;
+    if (!forceDemo && !canUseLive()) {
+      useDemo = true;
+      setError(
+        `Free live drafts used up (${FREE_LIVE_LIMIT}). Running demo drafts (unlimited).`,
+      );
+    }
+
     try {
       const res = await fetch("/api/pitch", {
         method: "POST",
@@ -68,13 +101,16 @@ export function PitchDesk() {
             daysLive: Number(profile.daysLive) || 0,
           },
           communityId,
-          forceDemo,
+          forceDemo: useDemo,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Request failed");
       const pitch = data as PitchResult;
-      setResult(pitch);
+      if (!useDemo && pitch.mode === "live") {
+        setLiveLeft(consumeLive());
+      }
+      applyResult(pitch);
       setHistory(pushHistory(profile, pitch));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed");
@@ -83,20 +119,44 @@ export function PitchDesk() {
     }
   }
 
-  async function copyText(kind: "soft" | "md", text: string) {
+  function rescoreSoft() {
+    if (!result) return;
+    const community = getCommunity(result.communityId);
+    const softRisk = scoreDraft(
+      editTitle.trim() || undefined,
+      editBody,
+      community,
+    );
+    const next: PitchResult = {
+      ...result,
+      softDraft: {
+        title: editTitle.trim() || undefined,
+        body: editBody,
+      },
+      softRisk,
+    };
+    setResult(next);
+    setMeterKey((k) => k + 1);
+    setShareLink(
+      shareUrl(pitchToSharePayload(profile.name, next, profile.oneLiner)),
+    );
+    setHistory(pushHistory(profile, next));
+  }
+
+  async function copyText(kind: "soft" | "md" | "share", text: string) {
     setCopyError(null);
     try {
       await navigator.clipboard.writeText(text);
       setCopied(kind);
       setTimeout(() => setCopied(null), 1600);
     } catch {
-      setCopyError("Clipboard blocked. Select the draft and copy manually.");
+      setCopyError("Clipboard blocked. Select the text and copy manually.");
     }
   }
 
   async function copySoft() {
     if (!result) return;
-    const text = [result.softDraft.title, result.softDraft.body]
+    const text = [editTitle || result.softDraft.title, editBody || result.softDraft.body]
       .filter(Boolean)
       .join("\n\n");
     await copyText("soft", text);
@@ -104,7 +164,19 @@ export function PitchDesk() {
 
   async function copyMarkdown() {
     if (!result) return;
-    await copyText("md", formatSoftMarkdown(result));
+    const temp: PitchResult = {
+      ...result,
+      softDraft: {
+        title: editTitle.trim() || undefined,
+        body: editBody,
+      },
+    };
+    await copyText("md", formatSoftMarkdown(temp));
+  }
+
+  async function copyShare() {
+    if (!shareLink) return;
+    await copyText("share", shareLink);
   }
 
   function restoreHistory(item: HistoryItem) {
@@ -114,7 +186,7 @@ export function PitchDesk() {
     });
     setCommunityId(item.communityId);
     setRestoredOnly(true);
-    setResult({
+    const restored: PitchResult = {
       communityId: item.communityId,
       spamDraft: {
         title: "Not stored in history",
@@ -138,7 +210,8 @@ export function PitchDesk() {
       },
       tips: ["History is stored only in this browser."],
       mode: item.mode,
-    });
+    };
+    applyResult(restored);
   }
 
   return (
@@ -152,9 +225,16 @@ export function PitchDesk() {
             Write the post. Check the room.
           </h1>
           <p className="mt-3 max-w-md text-[var(--mute)]">
-            Tact drafts a soft community post for your newly launched app,
-            shows the spam version you almost wrote, and scores both with a
-            deterministic risk engine.
+            Soft community posts for a newly launched product, with a live
+            risk engine and before/after meters.
+          </p>
+          <p className="mt-2 text-xs text-[var(--mute)]">
+            Free live drafts left:{" "}
+            <span className="font-medium text-[var(--ink)]">
+              {liveLeft}/{FREE_LIVE_LIMIT}
+            </span>
+            {" · "}
+            Demo drafts unlimited
           </p>
         </div>
 
@@ -164,17 +244,24 @@ export function PitchDesk() {
             onClick={() => setProfile(SAMPLE_PROFILE)}
             className="rounded-full border border-[var(--line-strong)] bg-[var(--paper-2)] px-3 py-1.5 text-xs font-medium text-[var(--ink)] transition hover:bg-[var(--paper-3)]"
           >
-            Load sample: Focusrail
+            Sample: Focusrail
+          </button>
+          <button
+            type="button"
+            onClick={() => setProfile(PROOFLET_PROFILE)}
+            className="rounded-full border border-[var(--line-strong)] bg-[var(--paper-2)] px-3 py-1.5 text-xs font-medium text-[var(--ink)] transition hover:bg-[var(--paper-3)]"
+          >
+            Sample: Prooflet
           </button>
         </div>
 
         <div className="space-y-4 rounded-2xl border border-[var(--line)] bg-[var(--paper-2)] p-5 shadow-[0_1px_0_rgba(20,16,12,0.04)]">
-          <Field label="App name">
+          <Field label="App / product name">
             <input
               className="field"
               value={profile.name}
               onChange={(e) => setField("name", e.target.value)}
-              placeholder="Focusrail"
+              placeholder="Prooflet"
             />
           </Field>
           <Field label="One-liner">
@@ -198,7 +285,7 @@ export function PitchDesk() {
               className="field"
               value={profile.whoFor}
               onChange={(e) => setField("whoFor", e.target.value)}
-              placeholder="Solo freelancers on client days"
+              placeholder="Agent operators, indie iOS devs…"
             />
           </Field>
           <Field label="What makes it different">
@@ -238,7 +325,7 @@ export function PitchDesk() {
                 }
               />
             </Field>
-            <Field label="Store URL (optional)">
+            <Field label="URL (optional)">
               <input
                 className="field"
                 value={profile.storeUrl || ""}
@@ -289,7 +376,11 @@ export function PitchDesk() {
               onClick={() => generate(false)}
               className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-sm font-medium text-[var(--paper)] transition enabled:hover:bg-[var(--ink-soft)] disabled:opacity-40"
             >
-              {loading ? "Drafting…" : "Draft with Tact"}
+              {loading
+                ? "Drafting…"
+                : liveLeft > 0
+                  ? "Draft with Tact (live)"
+                  : "Draft (demo; live used up)"}
             </button>
             <button
               type="button"
@@ -369,20 +460,26 @@ export function PitchDesk() {
                 Side-by-side output
               </p>
               <p className="mt-2 max-w-sm text-sm text-[var(--mute)]">
-                Spam posture on the left. Soft post on the right. Risk score
-                from rules, not vibes.
+                Spam vs soft, risk meters, in-place edit + re-score, shareable
+                judge link.
               </p>
             </div>
             <ol className="space-y-3 text-sm text-[var(--mute)]">
-              <li>1. Load the sample or paste your app facts</li>
-              <li>2. Pick the room you will actually post in</li>
-              <li>3. Copy the soft draft, edit one lived detail, post</li>
+              <li>1. Load Focusrail or Prooflet sample</li>
+              <li>2. Pick a room (incl. Product Hunt maker + X)</li>
+              <li>3. Draft → edit soft → re-score → share link</li>
             </ol>
           </div>
         )}
 
         {result && (
           <>
+            <RiskCompare
+              before={result.spamRisk}
+              after={result.softRisk}
+              animateKey={meterKey}
+            />
+
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-xs uppercase tracking-[0.14em] text-[var(--mute)]">
                 Mode · {result.mode}
@@ -404,11 +501,33 @@ export function PitchDesk() {
                 >
                   {copied === "md" ? "Copied markdown" : "Copy markdown"}
                 </button>
+                {shareLink && (
+                  <button
+                    type="button"
+                    onClick={copyShare}
+                    className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--mute)] transition hover:text-[var(--ink)]"
+                  >
+                    {copied === "share" ? "Copied share link" : "Copy share link"}
+                  </button>
+                )}
               </div>
             </div>
             {copyError && (
               <p className="text-sm text-[var(--bad)]" role="alert">
                 {copyError}
+              </p>
+            )}
+            {shareLink && (
+              <p className="break-all text-xs text-[var(--mute)]">
+                Share for judges:{" "}
+                <a
+                  className="text-[var(--accent)] underline-offset-2 hover:underline"
+                  href={shareLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {shareLink.slice(0, 72)}…
+                </a>
               </p>
             )}
 
@@ -421,12 +540,34 @@ export function PitchDesk() {
                   risk={result.spamRisk}
                 />
               )}
-              <DraftCard
-                kind="soft"
-                title={result.softDraft.title}
-                body={result.softDraft.body}
-                risk={result.softRisk}
-              />
+              <article className="flex flex-col rounded-2xl border border-[var(--ok)]/25 bg-[var(--ok-bg)]/35 p-5">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink)]">
+                    Soft draft (editable)
+                  </h3>
+                </div>
+                <RiskBadge report={result.softRisk} />
+                {communityId !== "xtwitter" && (
+                  <input
+                    className="field mt-4 font-[family-name:var(--font-display)] text-lg"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="Title"
+                  />
+                )}
+                <textarea
+                  className="field mt-3 min-h-[200px] flex-1 font-sans text-sm leading-relaxed"
+                  value={editBody}
+                  onChange={(e) => setEditBody(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={rescoreSoft}
+                  className="mt-3 self-start rounded-full border border-[var(--ink)] px-4 py-2 text-sm font-medium text-[var(--ink)] transition hover:bg-[var(--paper)]"
+                >
+                  Re-score risk
+                </button>
+              </article>
             </div>
 
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--paper-2)] p-5">

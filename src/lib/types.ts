@@ -4,7 +4,9 @@ export type CommunityId =
   | "sideproject"
   | "iosprogramming"
   | "indiehackers"
-  | "androiddev";
+  | "androiddev"
+  | "producthunt"
+  | "xtwitter";
 
 export interface AppProfile {
   name: string;
@@ -62,4 +64,19 @@ export interface PitchRequest {
   profile: AppProfile;
   communityId: CommunityId;
   forceDemo?: boolean;
+}
+
+/** Compact payload for shareable links (no secrets). */
+export interface SharePayload {
+  v: 1;
+  appName: string;
+  communityId: CommunityId;
+  softTitle?: string;
+  softBody: string;
+  softLevel: RiskLevel;
+  softScore: number;
+  spamLevel: RiskLevel;
+  spamScore: number;
+  mode: "live" | "demo";
+  oneLiner?: string;
 }

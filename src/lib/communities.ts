@@ -57,6 +57,34 @@ export const COMMUNITIES: Record<CommunityId, Community> = {
     titleHint: "Launched on Play - tradeoffs I made on X",
     maxWords: 200,
   },
+  producthunt: {
+    id: "producthunt",
+    name: "Product Hunt maker comment",
+    venue: "Product Hunt",
+    tone: "Maker note under your own launch: human, specific, grateful, not a second sales page.",
+    rules: [
+      "Write as the maker, first person",
+      "Explain who it is for and the problem in plain language",
+      "Invite a concrete try or critique, not pure hype",
+      "One link max; no emoji walls or fake social proof",
+    ],
+    titleHint: "(optional heading) Why I built this",
+    maxWords: 160,
+  },
+  xtwitter: {
+    id: "xtwitter",
+    name: "X / Twitter",
+    venue: "X",
+    tone: "Short founder post. Specific problem, one wedge, soft CTA. No thread of ads.",
+    rules: [
+      "Keep it under ~240 characters of substance when possible",
+      "Lead with problem or insight, not Download now",
+      "At most one link",
+      "No engagement-bait ALL CAPS or emoji spam",
+    ],
+    titleHint: "(no title; body is the post)",
+    maxWords: 55,
+  },
 };
 
 export const COMMUNITY_LIST = Object.values(COMMUNITIES);
