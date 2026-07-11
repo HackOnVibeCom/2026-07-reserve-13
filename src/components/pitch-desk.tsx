@@ -25,6 +25,12 @@ import type {
 } from "@/lib/types";
 import { RiskBadge, RiskList } from "./risk-badge";
 import { RiskCompare } from "./risk-meter";
+import {
+  IconCheck,
+  IconCopy,
+  IconMarkdown,
+  IconShare,
+} from "./action-icons";
 
 const empty: AppProfile = {
   name: "",
@@ -460,14 +466,13 @@ export function PitchDesk() {
                 Side-by-side output
               </p>
               <p className="mt-2 max-w-sm text-sm text-[var(--mute)]">
-                Spam vs soft, risk meters, in-place edit + re-score, shareable
-                judge link.
+                Soft draft next to the spam version. Edit, re-score, share.
               </p>
             </div>
             <ol className="space-y-3 text-sm text-[var(--mute)]">
-              <li>1. Load Focusrail or Prooflet sample</li>
-              <li>2. Pick a room (incl. Product Hunt maker + X)</li>
-              <li>3. Draft → edit soft → re-score → share link</li>
+              <li>1. Load a sample or paste your product</li>
+              <li>2. Pick the room</li>
+              <li>3. Draft, edit, re-score</li>
             </ol>
           </div>
         )}
@@ -480,54 +485,35 @@ export function PitchDesk() {
               animateKey={meterKey}
             />
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-xs uppercase tracking-[0.14em] text-[var(--mute)]">
-                Mode · {result.mode}
-                {result.model ? ` · ${result.model}` : ""}
-                {restoredOnly ? " · restored" : ""}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={copySoft}
-                  className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <IconBtn
+                label={copied === "soft" ? "Copied" : "Copy soft draft"}
+                onClick={copySoft}
+                primary
+                done={copied === "soft"}
+              >
+                {copied === "soft" ? <IconCheck /> : <IconCopy />}
+              </IconBtn>
+              <IconBtn
+                label={copied === "md" ? "Copied" : "Copy markdown"}
+                onClick={copyMarkdown}
+                done={copied === "md"}
+              >
+                {copied === "md" ? <IconCheck /> : <IconMarkdown />}
+              </IconBtn>
+              {shareLink && (
+                <IconBtn
+                  label={copied === "share" ? "Copied" : "Share link"}
+                  onClick={copyShare}
+                  done={copied === "share"}
                 >
-                  {copied === "soft" ? "Copied soft draft" : "Copy soft draft"}
-                </button>
-                <button
-                  type="button"
-                  onClick={copyMarkdown}
-                  className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--mute)] transition hover:text-[var(--ink)]"
-                >
-                  {copied === "md" ? "Copied markdown" : "Copy markdown"}
-                </button>
-                {shareLink && (
-                  <button
-                    type="button"
-                    onClick={copyShare}
-                    className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--mute)] transition hover:text-[var(--ink)]"
-                  >
-                    {copied === "share" ? "Copied share link" : "Copy share link"}
-                  </button>
-                )}
-              </div>
+                  {copied === "share" ? <IconCheck /> : <IconShare />}
+                </IconBtn>
+              )}
             </div>
             {copyError && (
               <p className="text-sm text-[var(--bad)]" role="alert">
                 {copyError}
-              </p>
-            )}
-            {shareLink && (
-              <p className="break-all text-xs text-[var(--mute)]">
-                Share for judges:{" "}
-                <a
-                  className="text-[var(--accent)] underline-offset-2 hover:underline"
-                  href={shareLink}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {shareLink.slice(0, 72)}…
-                </a>
               </p>
             )}
 
@@ -543,7 +529,7 @@ export function PitchDesk() {
               <article className="flex flex-col rounded-2xl border border-[var(--ok)]/25 bg-[var(--ok-bg)]/35 p-5">
                 <div className="mb-3 flex items-center justify-between gap-2">
                   <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink)]">
-                    Soft draft (editable)
+                    Soft draft
                   </h3>
                 </div>
                 <RiskBadge report={result.softRisk} />
@@ -592,6 +578,37 @@ export function PitchDesk() {
     </div>
   );
 }
+
+function IconBtn({
+  label,
+  onClick,
+  children,
+  primary = false,
+  done = false,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+  primary?: boolean;
+  done?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${
+        primary
+          ? "bg-[var(--accent)] text-white hover:opacity-90"
+          : "border border-[var(--line-strong)] text-[var(--ink-soft)] hover:border-[var(--ink)] hover:text-[var(--ink)]"
+      } ${done ? "ring-2 ring-[var(--ok)]/40" : ""}`}
+    >
+      {children}
+    </button>
+  );
+}
+
 
 function Field({
   label,
