@@ -26,6 +26,12 @@ Built for [HackOnVibe — July 2026](https://dorahacks.io/hackathon/hack-on-vibe
 - Optional live drafts via [OpenRouter](https://openrouter.ai)
 - Offline-capable **demo drafts** when no API key is set
 
+## Links
+
+- **Live:** https://tact-liard.vercel.app
+- **Desk:** https://tact-liard.vercel.app/app
+- **GitHub:** https://github.com/ShalyX/tact
+
 ## Setup
 
 ```bash
