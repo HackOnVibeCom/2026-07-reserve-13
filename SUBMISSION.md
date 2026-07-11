@@ -26,8 +26,9 @@ Solo indie iOS/Android builders who just shipped and need one good community pos
 - Sample app (Focusrail) for one-click demo
 
 ## Links
-- Live demo: *(add Vercel URL after deploy)*
-- GitHub: *(add after push)*
+- Live demo: https://tact-liard.vercel.app
+- Desk: https://tact-liard.vercel.app/app
+- GitHub: https://github.com/ShalyX/tact
 - Demo video: *(unlisted YouTube, ≤3 min — use docs/demo-script.md)*
 
 ## How to run
