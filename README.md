@@ -14,6 +14,7 @@ Built for [HackOnVibe — July 2026](https://dorahacks.io/hackathon/hack-on-vibe
 | Desk | https://tact-liard.vercel.app/app |
 | Team status | https://hackonvibe.com/find-team |
 | HackOnVibe repo | https://github.com/HackOnVibeCom/2026-07-gremlin-prime |
+| Live Demo | https://youtu.be/wAWfEYigh7E?si=SK9qLL5NkSmqFJxx |
 
 > Cloudflare Pages auto-deploy is wired via `.github/workflows/deploy.yml`.  
 > The full product (live LLM drafts + `/api/pitch`) runs on **Vercel** because it needs a Node API runtime. CF pipeline may treat this as Next SSR; use the Vercel URL for the working demo.
